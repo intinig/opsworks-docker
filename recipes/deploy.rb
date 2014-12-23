@@ -2,15 +2,17 @@ node[:deploy].each do |application, deploy|
 
   # node[:deploy]['appshortname'][:environment_variables][:variable_name]
 
+  environment = deploy[:environment_variables]
+
   if deploy[:application_type] != 'other'
     Chef::Log.debug("Skipping deploy::docker application #{application} as it is not deployed to this layer")
     next
-  elsif deploy[:environment_variables][:APP_TYPE] != 'docker'
+  elsif environment.delete(:APP_TYPE) != 'docker'
     Chef::Log.debug("Skipping deploy::docker application #{application} as it is not of type 'docker'")
     next
   end
 
-  image = deploy[:environment_variables][:IMAGE]
+  image = environment.delete :IMAGE
   Chef::Log.debug("Going to deploy '#{application}', from '#{image}'")
 
 
@@ -34,7 +36,7 @@ node[:deploy].each do |application, deploy|
   execute "launch #{application} container" do
     Chef::Log.info("Launching #{image}...")
 
-    env_vars = {
+    env_vars = environment.merge {
       "PG_HOST" => deploy[:database][:host],
       "PG_USER" =>  deploy[:database][:username],
       "PG_PASSWORD" => deploy[:database][:password]
@@ -44,6 +46,14 @@ node[:deploy].each do |application, deploy|
       memo + "--env \"#{key}=#{value}\" "
     end
 
-    command "docker run -d --name #{application} #{env_string} #{image}"
+    volumes_from = application["volumes_from"].inject("") do |memo, value|
+      memo + "--volumes-from #{value}"
+    end
+
+    ports = application["ports"].inject("") do |memo, value|
+      memo + "-p #{value}"
+    end
+    
+    command "docker run -d --name #{application} #{ports} #{env_string} #{volumes_from} #{image}"
   end
 end

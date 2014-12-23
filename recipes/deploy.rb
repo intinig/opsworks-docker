@@ -58,7 +58,7 @@ node[:deploy].each do |application, deploy|
     links = deploy["links"].inject("") do |memo, value|
       memo + "--link #{value} "
     end if deploy["links"]
-    Chef::Log.info("[DEBUG] docker run -d --name #{application} #{ports} #{env_string} #{volumes_from} #{image}")
-    command "docker run -d --name #{application} #{ports} #{env_string} #{volumes_from} #{image}"
+    Chef::Log.info("[DEBUG] docker run -d --name #{application} #{ports} #{env_string} #{links} #{volumes_from} #{image}")
+    command "docker run -d --name #{application} #{ports} #{env_string} #{links} #{volumes_from} #{image}"
   end
 end

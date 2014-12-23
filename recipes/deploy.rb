@@ -36,11 +36,12 @@ node[:deploy].each do |application, deploy|
   execute "launch #{application} container" do
     Chef::Log.info("Launching #{image}...")
 
-    env_vars = environment.merge({
+    env_vars = environment
+    env_vars.merge({
       "PG_HOST" => deploy[:database][:host],
       "PG_USER" =>  deploy[:database][:username],
       "PG_PASSWORD" => deploy[:database][:password]
-    })
+    }) if deploy[:database]
 
     env_string = env_vars.inject("") do |memo, (key, value)|
       memo + "--env \"#{key}=#{value}\" "
@@ -48,15 +49,15 @@ node[:deploy].each do |application, deploy|
 
     volumes_from = application["volumes_from"].inject("") do |memo, value|
       memo + "--volumes-from #{value}"
-    end
+    end if application["volumes_from"]
 
     ports = application["ports"].inject("") do |memo, value|
       memo + "-p #{value}"
-    end
+    end if application["ports"]
 
     links = application["links"].inject("") do |memo, value|
       memo + "--link #{value}"
-    end
+    end if application["links"]
     
     command "docker run -d --name #{application} #{ports} #{env_string} #{volumes_from} #{image}"
   end

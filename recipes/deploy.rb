@@ -37,11 +37,13 @@ node[:deploy].each do |application, deploy|
     Chef::Log.info("Launching #{image}...")
 
     env_vars = environment
-    env_vars.merge!({
-      "PG_HOST" => deploy[:database][:host],
+
+    { "PG_HOST" => deploy[:database][:host],
       "PG_USER" =>  deploy[:database][:username],
       "PG_PASSWORD" => deploy[:database][:password]
-    }) if deploy[:database]
+    }.each do |k,v|
+      env_vars[k] = v unless v.nil? || v = ""
+    end
 
     env_string = env_vars.inject("") do |memo, (key, value)|
       memo + "--env \"#{key}=#{value}\" "

@@ -48,15 +48,15 @@ node[:deploy].each do |application, deploy|
     end
 
     volumes_from = deploy["volumes_from"].inject("") do |memo, value|
-      memo + "--volumes-from #{value}"
+      memo + "--volumes-from #{value} "
     end if deploy["volumes_from"]
 
     ports = deploy["ports"].inject("") do |memo, value|
-      memo + "-p #{value}"
+      memo + "-p #{value} "
     end if deploy["ports"]
 
     links = deploy["links"].inject("") do |memo, value|
-      memo + "--link #{value}"
+      memo + "--link #{value} "
     end if deploy["links"]
     
     command "docker run -d --name #{application} #{ports} #{env_string} #{volumes_from} #{image}"

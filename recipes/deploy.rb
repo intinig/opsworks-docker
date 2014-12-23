@@ -47,17 +47,17 @@ node[:deploy].each do |application, deploy|
       memo + "--env \"#{key}=#{value}\" "
     end
 
-    volumes_from = application["volumes_from"].inject("") do |memo, value|
+    volumes_from = deploy["volumes_from"].inject("") do |memo, value|
       memo + "--volumes-from #{value}"
-    end if application["volumes_from"]
+    end if deploy["volumes_from"]
 
-    ports = application["ports"].inject("") do |memo, value|
+    ports = deploy["ports"].inject("") do |memo, value|
       memo + "-p #{value}"
-    end if application["ports"]
+    end if deploy["ports"]
 
-    links = application["links"].inject("") do |memo, value|
+    links = deploy["links"].inject("") do |memo, value|
       memo + "--link #{value}"
-    end if application["links"]
+    end if deploy["links"]
     
     command "docker run -d --name #{application} #{ports} #{env_string} #{volumes_from} #{image}"
   end

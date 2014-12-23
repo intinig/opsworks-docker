@@ -2,7 +2,7 @@ node[:deploy].each do |application, deploy|
 
   # node[:deploy]['appshortname'][:environment_variables][:variable_name]
 
-  environment = deploy[:environment_variables]
+  environment = deploy[:environment_variables].dup
 
   if deploy[:application_type] != 'other'
     Chef::Log.debug("Skipping deploy::docker application #{application} as it is not deployed to this layer")

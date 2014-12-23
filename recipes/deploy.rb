@@ -53,6 +53,10 @@ node[:deploy].each do |application, deploy|
     ports = application["ports"].inject("") do |memo, value|
       memo + "-p #{value}"
     end
+
+    links = application["links"].inject("") do |memo, value|
+      memo + "--link #{value}"
+    end
     
     command "docker run -d --name #{application} #{ports} #{env_string} #{volumes_from} #{image}"
   end

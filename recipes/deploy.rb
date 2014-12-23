@@ -22,12 +22,13 @@ node[:deploy].each do |application, deploy|
   execute "kill running #{application} container" do
     Chef::Log.info("Killing running #{application} containers...")
     command "docker kill #{application}"
-    only_if "INSPECT=`docker inspect -f '{{ .State.Running }}' #{application}`; if [ $? -ne 0 -o '$INSPECT' == 'false' ]; then (exit 1); fi;"
+    only_if "docker ps | grep ' #{application} '"
   end
 
   execute "remove stopped #{application} container" do
     Chef::Log.info("Removing the #{application} container...")
     command "docker rm  #{application}"
+    only_if "docker ps -a | grep ' #{application} '"
   end
 
   execute "launch #{application} container" do

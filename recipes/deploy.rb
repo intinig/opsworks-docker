@@ -37,7 +37,7 @@ node[:deploy].each do |application, deploy|
     Chef::Log.info("Launching #{image}...")
 
     env_vars = environment
-    env_vars.merge({
+    env_vars.merge!({
       "PG_HOST" => deploy[:database][:host],
       "PG_USER" =>  deploy[:database][:username],
       "PG_PASSWORD" => deploy[:database][:password]

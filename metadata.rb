@@ -1,4 +1,4 @@
-name        "Docker"
+name        "docker"
 description "Manage Docker images"
 maintainer  "Giovanni Intini"
 license     "Apache 2.0"

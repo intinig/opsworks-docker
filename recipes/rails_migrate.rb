@@ -19,7 +19,7 @@ node[:deploy].each do |application, deploy|
 
   
   execute "migrating #{application} container" do
-    Chef::Log.info("Launching #{image}...")
+    Chef::Log.info("Migrating #{application} from  #{image}...")
 
     env_vars = {
       "PG_HOST" => deploy[:database][:host],

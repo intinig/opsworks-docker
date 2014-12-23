@@ -31,6 +31,6 @@ node[:deploy].each do |application, deploy|
       memo + "--env \"#{key}=#{value}\" "
     end
 
-    command "docker run --rm --name #{application} #{env_string} #{image} bundle exec rake db:migrate"
+    command "docker run --rm #{env_string} #{image} bundle exec rake db:migrate"
   end
 end

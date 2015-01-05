@@ -69,6 +69,7 @@ node[:deploy].each do |application, deploy|
   end if deploy["links"]
 
   containers.times do |i|
+    Chef::Log.info "docker run -d --name #{application}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image}"
     execute "launch #{application} container" do
       command "docker run -d --name #{application}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image}"
     end

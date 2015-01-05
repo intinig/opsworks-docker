@@ -44,7 +44,7 @@ node[:deploy].each do |application, deploy|
   end
 
   containers.times do |i|
-    execute "launch #{application} container" do
+    execute "launch #{application}#{i} container" do
       Chef::Log.info("Launching #{image}...")
       
       { "PG_HOST" => deploy[:database][:host],

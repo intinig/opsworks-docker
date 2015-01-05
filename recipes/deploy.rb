@@ -51,7 +51,7 @@ node[:deploy].each do |application, deploy|
         "PG_USER" =>  deploy[:database][:username],
         "PG_PASSWORD" => deploy[:database][:password]
       }.each do |k,v|
-        environment[k] = v unless v.nil? || v = ""
+        environment[k] = v unless v.nil? || v == ""
       end
       
       env_string = environment.inject("") do |memo, (key, value)|

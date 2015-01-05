@@ -15,50 +15,62 @@ node[:deploy].each do |application, deploy|
   image = environment.delete :IMAGE
   Chef::Log.debug("Going to deploy '#{application}', from '#{image}'")
 
-
+  containers = environment.delete :CONTAINERS
+  containers = containers ? containers.to_i : 1
+  
   execute "pulling #{application} image" do
     Chef::Log.info("Pulling '#{image}'...")
     command "docker pull #{image}"
   end
 
-  execute "kill running #{application} container" do
-    Chef::Log.info("Killing running #{application} containers...")
-    command "docker kill #{application}"
-    only_if "docker ps -f status=running | grep ' #{application} '"
+  ##
+  # @TODO Here what we should actually be doing is spin up a new container
+  #       add it to some kind of load balancing haproxy and after we're done
+  #       and we're sure it's running we kill it.
+  containers.times do |i|
+    execute "kill running #{application}#{i} container" do
+      Chef::Log.info("Killing running #{application}#{i} containers...")
+      command "docker kill #{application}#{i}"
+      only_if "docker ps -f status=running | grep ' #{application}#{i} '"
+    end
   end
 
-  execute "remove stopped #{application} container" do
-    Chef::Log.info("Removing the #{application} container...")
-    command "docker rm  #{application}"
-    only_if "docker ps -a | grep ' #{application} '"
+  containers.times do |i|
+    execute "remove stopped #{application}#{i} container" do
+      Chef::Log.info("Removing the #{application}#{i} container...")
+      command "docker rm  #{application}#{i}"
+      only_if "docker ps -a | grep ' #{application}#{i} '"
+    end
   end
 
-  execute "launch #{application} container" do
-    Chef::Log.info("Launching #{image}...")
+  Chef::Log.info("Launching #{image}...")
+  
+  { "PG_HOST" => deploy[:database][:host],
+    "PG_USER" =>  deploy[:database][:username],
+    "PG_PASSWORD" => deploy[:database][:password]
+  }.each do |k,v|
+    environment[k] = v unless v.nil? || v = ""
+  end
+  
+  env_string = environment.inject("") do |memo, (key, value)|
+    memo + "--env \"#{key}=#{value}\" "
+  end
+  
+  volumes_from = deploy["volumes_from"].inject("") do |memo, value|
+    memo + "--volumes-from #{value} "
+  end if deploy["volumes_from"]
+  
+  ports = deploy["ports"].inject("") do |memo, value|
+    memo + "-p #{value} "
+  end if deploy["ports"]
+  
+  links = deploy["links"].inject("") do |memo, value|
+    memo + "--link #{value} "
+  end if deploy["links"]
 
-    { "PG_HOST" => deploy[:database][:host],
-      "PG_USER" =>  deploy[:database][:username],
-      "PG_PASSWORD" => deploy[:database][:password]
-    }.each do |k,v|
-      environment[k] = v unless v.nil? || v = ""
+  containers.times do |i|
+    execute "launch #{application} container" do
+      command "docker run -d --name #{application}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image}"
     end
-
-    env_string = environment.inject("") do |memo, (key, value)|
-      memo + "--env \"#{key}=#{value}\" "
-    end
-
-    volumes_from = deploy["volumes_from"].inject("") do |memo, value|
-      memo + "--volumes-from #{value} "
-    end if deploy["volumes_from"]
-
-    ports = deploy["ports"].inject("") do |memo, value|
-      memo + "-p #{value} "
-    end if deploy["ports"]
-
-    links = deploy["links"].inject("") do |memo, value|
-      memo + "--link #{value} "
-    end if deploy["links"]
-    Chef::Log.info("[DEBUG] docker run -d --name #{application} #{ports} #{env_string} #{links} #{volumes_from} #{image}")
-    command "docker run -d --name #{application} #{ports} #{env_string} #{links} #{volumes_from} #{image}"
   end
 end

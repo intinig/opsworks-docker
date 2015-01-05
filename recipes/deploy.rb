@@ -44,32 +44,31 @@ node[:deploy].each do |application, deploy|
   end
 
   containers.times do |i|
-    Chef::Log.info("Launching #{image}...")
-    
-    { "PG_HOST" => deploy[:database][:host],
-      "PG_USER" =>  deploy[:database][:username],
-      "PG_PASSWORD" => deploy[:database][:password]
-    }.each do |k,v|
-      environment[k] = v unless v.nil? || v = ""
-    end
-    
-    env_string = environment.inject("") do |memo, (key, value)|
-      memo + "--env \"#{key}=#{value}\" "
-    end
-    
-    volumes_from = deploy["volumes_from"].inject("") do |memo, value|
-      memo + "--volumes-from #{value} "
-    end if deploy["volumes_from"]
-    
-    ports = deploy["ports"].inject("") do |memo, value|
-      memo + "-p #{value} "
-    end if deploy["ports"]
-    
-    links = deploy["links"].inject("") do |memo, value|
-      memo + "--link #{value} "
-    end if deploy["links"]
-    
     execute "launch #{application} container" do
+      Chef::Log.info("Launching #{image}...")
+      
+      { "PG_HOST" => deploy[:database][:host],
+        "PG_USER" =>  deploy[:database][:username],
+        "PG_PASSWORD" => deploy[:database][:password]
+      }.each do |k,v|
+        environment[k] = v unless v.nil? || v = ""
+      end
+      
+      env_string = environment.inject("") do |memo, (key, value)|
+        memo + "--env \"#{key}=#{value}\" "
+      end
+      
+      volumes_from = deploy["volumes_from"].inject("") do |memo, value|
+        memo + "--volumes-from #{value} "
+      end if deploy["volumes_from"]
+      
+      ports = deploy["ports"].inject("") do |memo, value|
+        memo + "-p #{value} "
+      end if deploy["ports"]
+      
+      links = deploy["links"].inject("") do |memo, value|
+        memo + "--link #{value} "
+      end if deploy["links"]
       command "docker run -d --name #{application}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image}"
     end
   end

@@ -8,8 +8,8 @@ node[:deploy].each do |application, deploy|
     next
   end
 
-  deploy.each do |apps|
-    apps.each do |app_name, app_config|
+  deploy["containers"].each do |c|
+    c.each do |app_name, app_config|
       image = app_config["image"]
 
       containers = app_config["containers"] || 1

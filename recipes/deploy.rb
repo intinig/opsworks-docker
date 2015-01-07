@@ -88,7 +88,7 @@ node[:deploy].each do |application, deploy|
 
           Chef::Log.info("Launching #{image}...")
 
-          command "docker run -d -h #{hostname} --name #{app_name}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image} #{cmd}"
+          command "docker run -d -h #{hostname} --name #{app_name}#{i} #{ports} #{env_string} #{links} #{volumes} #{volumes_from} #{image} #{cmd}"
         end
       end
     end

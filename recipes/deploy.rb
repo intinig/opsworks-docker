@@ -8,6 +8,8 @@ node[:deploy].each do |application, deploy|
     next
   end
 
+
+
   deploy["containers"].each do |c|
     c.each do |app_name, app_config|
       next unless app_config["deploy"] == "auto" || (node["manual"] && node["manual"].include?(app_name))
@@ -21,6 +23,7 @@ node[:deploy].each do |application, deploy|
       volumes_from = app_config["volumes_from"] || []
       ports = app_config["ports"] || []
       links = app_config["links"] || []
+      hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname] if app_config["hostname"] == "opsworks"
 
       if app_config["database"]
         {
@@ -81,8 +84,11 @@ node[:deploy].each do |application, deploy|
         end
 
         execute "launch #{app_name}#{i} container" do
+          hostname ||= "#{app_name}#{i}"
+
           Chef::Log.info("Launching #{image}...")
-          command "docker run -d -h #{app_name}#{i} --name #{app_name}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image} #{cmd}"
+
+          command "docker run -d -h #{hostname} --name #{app_name}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image} #{cmd}"
         end
       end
     end

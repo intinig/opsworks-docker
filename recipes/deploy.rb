@@ -16,6 +16,8 @@ node[:deploy].each do |application, deploy|
       containers = app_config["containers"] || 1
 
       environment = (app_config["env"] || {}).dup
+      volumes = app_config["volumes"] || []
+      cmd = app_config["command"]
       volumes_from = app_config["volumes_from"] || []
       ports = app_config["ports"] || []
       links = app_config["links"] || []
@@ -36,6 +38,10 @@ node[:deploy].each do |application, deploy|
 
       env_string = environment.inject("") do |memo, (key, value)|
         memo + "--env \"#{key}=#{value}\" "
+      end
+
+      volumes = volumes.inject("") do |memo, value|
+        memo + "-v #{value} "
       end
 
       volumes_from = volumes_from.inject("") do |memo, value|
@@ -76,7 +82,7 @@ node[:deploy].each do |application, deploy|
 
         execute "launch #{app_name}#{i} container" do
           Chef::Log.info("Launching #{image}...")
-          command "docker run -d -h #{app_name}#{i} --name #{app_name}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image}"
+          command "docker run -d -h #{app_name}#{i} --name #{app_name}#{i} #{ports} #{env_string} #{links} #{volumes_from} #{image} #{cmd}"
         end
       end
     end

@@ -12,6 +12,7 @@ node[:deploy].each do |application, deploy|
 
   deploy["containers"].each do |c|
     c.each do |app_name, app_config|
+      Chef::Log.info("Evaluating #{app_name}...")
       next unless app_config["deploy"] == "auto" || (node["manual"] && node["manual"].include?(app_name))
       image = app_config["image"]
 

@@ -23,7 +23,11 @@ node[:deploy].each do |application, deploy|
       volumes_from = app_config["volumes_from"] || []
       ports = app_config["ports"] || []
       links = app_config["links"] || []
-      hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname] if app_config["hostname"] == "opsworks"
+
+      if app_config["hostname"] == "opsworks"
+        hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]
+        hostname = hostname.downcase.gsub(" ", "-")
+      end
 
       if app_config["database"]
         {

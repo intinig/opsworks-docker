@@ -42,10 +42,17 @@ class EnvHelper
   end
 
   def stringify(vals, parameter)
-    retval = (vals || []).inject("") do |memo, value|
+    (vals || []).inject("") do |memo, value|
       memo + "#{parameter} #{value}"
     end
+  end
 
-    retval
+  def stringify_hash(vals, parameter)
+    memo = ""
+    (vals || {}).each do |key, val|
+      memo + "#{parameter} '#{key}=#{val}'"
+    end
+
+    memo
   end
 end

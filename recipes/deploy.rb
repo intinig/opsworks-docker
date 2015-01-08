@@ -23,22 +23,6 @@ node[:deploy].each do |application, deploy|
         hostname = hostname.downcase.gsub(" ", "-")
       end
 
-      if app_config["database"]
-        {
-          "DB_ADAPTER" => deploy[:database][:adapter],
-          "DB_DATABASE" => deploy[:database][:database],
-          "DB_HOST" => deploy[:database][:host],
-          "DB_PASSWORD" => deploy[:database][:password],
-          "DB_PORT" => deploy[:database][:port],
-          "DB_RECONNECT" => deploy[:database][:reconnect],
-          "DB_USERNAME" =>  deploy[:database][:username]
-        }.each do |k,v|
-          environment[k] = v
-        end
-      end
-
-      e = EnvHelper.new app_config
-
       Chef::Log.debug("Deploying '#{application}/#{app_name}', from '#{image}'")
 
       execute "pulling #{image}" do
@@ -53,6 +37,8 @@ node[:deploy].each do |application, deploy|
           environment["RELEASE_TAG"] = tag
         end
       end
+
+      e = EnvHelper.new app_config
 
       containers.times do |i|
         execute "kill running #{app_name}#{i} container" do
@@ -71,8 +57,7 @@ node[:deploy].each do |application, deploy|
           hostname ||= "#{app_name}#{i}"
 
           Chef::Log.info("Launching #{image}...")
-
-          command "docker run -d -h #{hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
+          command "docker run -d -h #{hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
         end
       end
     end

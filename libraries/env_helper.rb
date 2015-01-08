@@ -7,7 +7,21 @@ class EnvHelper
     @app_config
   end
 
-  def env_string(environment)
+  def env_string(environment, deploy)
+    if app_config["database"]
+      {
+        "DB_ADAPTER" => deploy[:database][:adapter],
+        "DB_DATABASE" => deploy[:database][:database],
+        "DB_HOST" => deploy[:database][:host],
+        "DB_PASSWORD" => deploy[:database][:password],
+        "DB_PORT" => deploy[:database][:port],
+        "DB_RECONNECT" => deploy[:database][:reconnect],
+        "DB_USERNAME" =>  deploy[:database][:username]
+      }.each do |k,v|
+        environment[k] = v
+      end
+    end
+
     stringify(environment, "--env")
   end
 

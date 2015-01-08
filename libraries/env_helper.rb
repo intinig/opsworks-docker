@@ -26,19 +26,19 @@ class EnvHelper
   end
 
   def volumes
-    EnvHelper.stringify app_config["volumes"], "-v"
+    stringify app_config["volumes"], "-v"
   end
 
   def volumes_from
-    EnvHelper.stringify app_config["volumes"], "--volumes-from"
+    stringify app_config["volumes"], "--volumes-from"
   end
 
   def ports
-    EnvHelper.stringify app_config["ports"], "-p"
+    stringify app_config["ports"], "-p"
   end
 
   def links
-    EnvHelper.stringify app_config["links"], "--link"
+    stringify app_config["links"], "--link"
   end
 
   def stringify(vals, parameter)

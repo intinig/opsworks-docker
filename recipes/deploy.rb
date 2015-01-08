@@ -42,6 +42,19 @@ node[:deploy].each do |application, deploy|
         end
       end
 
+      Chef::Log.debug("Deploying '#{application}/#{app_name}', from '#{image}'")
+
+      execute "pulling #{image}" do
+        Chef::Log.info("Pulling '#{image}'...")
+        command "docker pull #{image}"
+      end
+
+      ruby_block "adding #{image} id to environment" do
+        block do
+          environment["RELEASE_TAG"] = `docker history -q #{image} | head 1`.strip
+        end
+      end
+
       env_string = environment.inject("") do |memo, (key, value)|
         memo + "--env \"#{key}=#{value}\" "
       end
@@ -62,18 +75,6 @@ node[:deploy].each do |application, deploy|
         memo + "--link #{value} "
       end
 
-      Chef::Log.debug("Deploying '#{application}/#{app_name}', from '#{image}'")
-
-      execute "pulling #{image}" do
-        Chef::Log.info("Pulling '#{image}'...")
-        command "docker pull #{image}"
-      end
-
-      ruby_block "adding #{image} id to environment" do
-        block do
-          environment["RELEASE_TAG"] = `docker history -q #{image} | head 1`.strip
-        end
-      end
 
       containers.times do |i|
         execute "kill running #{app_name}#{i} container" do

@@ -42,8 +42,10 @@ class EnvHelper
   end
 
   def stringify(vals, parameter)
-    (vals || []).inject("") do |memo, value|
+    retval = (vals || []).inject("") do |memo, value|
       memo + "#{parameter} #{value}"
     end
+
+    retval
   end
 end

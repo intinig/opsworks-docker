@@ -1,5 +1,3 @@
-extend Chef::Mixin::ShellOut
-
 node[:deploy].each do |application, deploy|
 
   if deploy[:application_type] != 'other'
@@ -73,7 +71,7 @@ node[:deploy].each do |application, deploy|
 
       ruby_block "adding #{image} id to environment" do
         block do
-          environment["RELEASE_TAG"] = shell_out("docker history -q #{image} | head 1").stdout
+          environment["RELEASE_TAG"] = `docker history -q #{image} | head 1`.strip
         end
       end
 

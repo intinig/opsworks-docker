@@ -46,7 +46,7 @@ node[:deploy].each do |application, deploy|
 
       execute "pulling #{image}" do
         Chef::Log.info("Pulling '#{image}'...")
-        command "docker pull #{image}"
+        command "docker pull #{image}:latest"
       end
 
       ruby_block "adding #{image} id to environment" do

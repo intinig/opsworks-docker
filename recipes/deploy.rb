@@ -1,3 +1,5 @@
+extend Chef::Mixin::ShellOut
+
 node[:deploy].each do |application, deploy|
 
   if deploy[:application_type] != 'other'
@@ -7,8 +9,6 @@ node[:deploy].each do |application, deploy|
     Chef::Log.debug("Skipping deploy::docker application #{application} as it is not of type 'docker'")
     next
   end
-
-
 
   deploy["containers"].each do |c|
     c.each do |app_name, app_config|
@@ -71,10 +71,12 @@ node[:deploy].each do |application, deploy|
         command "docker pull #{image}"
       end
 
-      ##
-      # @TODO Here what we should actually be doing is spin up a new container
-      #       add it to some kind of load balancing haproxy and after we're done
-      #       and we're sure it's running we kill it.
+      ruby_block "adding #{image} id to environment" do
+        block do
+          environment["RELEASE_TAG"] = shell_out("docker history -q #{image} | head 1").stdout
+        end
+      end
+
       containers.times do |i|
         execute "kill running #{app_name}#{i} container" do
           Chef::Log.info("Killing running #{application}/#{app_name}#{i} container...")

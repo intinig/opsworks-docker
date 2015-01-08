@@ -22,7 +22,7 @@ class EnvHelper
       end
     end
 
-    stringify(environment, "--env")
+    stringify_hash(environment, "--env")
   end
 
   def volumes

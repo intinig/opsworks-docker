@@ -1,5 +1,6 @@
-node[:deploy].each do |application, deploy|
+include EnvHelper
 
+node[:deploy].each do |application, deploy|
   if deploy[:application_type] != 'other'
     Chef::Log.debug("Skipping deploy::docker application #{application} as it is not deployed to this layer")
     next
@@ -12,16 +13,10 @@ node[:deploy].each do |application, deploy|
     c.each do |app_name, app_config|
       Chef::Log.info("Evaluating #{app_name}...")
       next unless app_config["deploy"] == "auto" || (node["manual"] && node["manual"].include?(app_name))
+
       image = app_config["image"]
-
       containers = app_config["containers"] || 1
-
       environment = (app_config["env"] || {}).dup
-      volumes = app_config["volumes"] || []
-      cmd = app_config["command"]
-      volumes_from = app_config["volumes_from"] || []
-      ports = app_config["ports"] || []
-      links = app_config["links"] || []
 
       if app_config["hostname"] == "opsworks"
         hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]
@@ -42,6 +37,8 @@ node[:deploy].each do |application, deploy|
         end
       end
 
+      e = EnvHelper.new app_config
+
       Chef::Log.debug("Deploying '#{application}/#{app_name}', from '#{image}'")
 
       execute "pulling #{image}" do
@@ -56,27 +53,6 @@ node[:deploy].each do |application, deploy|
           environment["RELEASE_TAG"] = tag
         end
       end
-
-      env_string = environment.inject("") do |memo, (key, value)|
-        memo + "--env \"#{key}=#{value}\" "
-      end
-
-      volumes = volumes.inject("") do |memo, value|
-        memo + "-v #{value} "
-      end
-
-      volumes_from = volumes_from.inject("") do |memo, value|
-        memo + "--volumes-from #{value} "
-      end
-
-      ports = ports.inject("") do |memo, value|
-        memo + "-p #{value} "
-      end
-
-      links = links.inject("") do |memo, value|
-        memo + "--link #{value} "
-      end
-
 
       containers.times do |i|
         execute "kill running #{app_name}#{i} container" do
@@ -96,7 +72,7 @@ node[:deploy].each do |application, deploy|
 
           Chef::Log.info("Launching #{image}...")
 
-          command "docker run -d -h #{hostname} --name #{app_name}#{i} #{ports} #{env_string} #{links} #{volumes} #{volumes_from} #{image} #{cmd}"
+          command "docker run -d -h #{hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
         end
       end
     end

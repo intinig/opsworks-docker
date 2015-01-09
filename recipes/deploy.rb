@@ -32,6 +32,7 @@ node[:deploy].each do |application, deploy|
         block do
           tag = `docker history -q #{image} | head -1`.strip
           environment["RELEASE_TAG"] = tag
+          Chef::Log.info "[DEBUG] our post-tag env is #{environment.inspect}"
         end
       end
 

@@ -31,7 +31,6 @@ node[:deploy].each do |application, deploy|
       ruby_block "adding #{image} id to environment" do
         block do
           tag = `docker history -q #{image} | head -1`.strip
-          Chef::Log.info("[DEBUG] #{image}:#{tag}")
           environment["RELEASE_TAG"] = tag
         end
       end
@@ -55,8 +54,6 @@ node[:deploy].each do |application, deploy|
           hostname ||= "#{app_name}#{i}"
 
           Chef::Log.info("Launching #{image}...")
-          Chef::Log.info("[DEBUG] Environment #{environment.inspect}")
-          Chef::Log.info("[DEBUG] Env String #{e.env_string(environment, deploy)}")
 
           command "docker run -d -h #{hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
         end

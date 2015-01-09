@@ -1,15 +1,10 @@
 class EnvHelper
-  def initialize app_config, node
+  def initialize app_config
     @app_config = app_config
-    @node = node
   end
 
   def app_config
     @app_config
-  end
-
-  def node
-    @node
   end
 
   def env_string(environment, deploy)
@@ -26,8 +21,6 @@ class EnvHelper
         environment[k] = v
       end
     end
-
-    environment["RELEASE_TAG"] = node[app_config["image"]]
 
     Chef::Log.info "[DEBUG] our pre-string env is #{environment.inspect}"
 

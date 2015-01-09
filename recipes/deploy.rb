@@ -28,13 +28,7 @@ node[:deploy].each do |application, deploy|
         command "docker pull #{image}:latest"
       end
 
-      ruby_block "adding #{image} id to environment" do
-        block do
-          node.override[image] = `docker history -q #{image} | head -1`.strip
-        end
-      end
-
-      e = EnvHelper.new app_config, node
+      e = EnvHelper.new app_config
 
       containers.times do |i|
         execute "kill running #{app_name}#{i} container" do
@@ -51,6 +45,7 @@ node[:deploy].each do |application, deploy|
 
         execute "launch #{app_name}#{i} container" do
           hostname ||= "#{app_name}#{i}"
+          environment["RELEASE_TAG"] = `docker history -q #{image} | head -1`.strip
 
           Chef::Log.info("Launching #{image}...")
 

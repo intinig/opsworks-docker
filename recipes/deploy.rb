@@ -30,9 +30,7 @@ node[:deploy].each do |application, deploy|
 
       ruby_block "adding #{image} id to environment" do
         block do
-          tag = `docker history -q #{image} | head -1`.strip
-          environment["RELEASE_TAG"] = tag
-          Chef::Log.info "[DEBUG] our post-tag env is #{environment.inspect}"
+          node[image] = `docker history -q #{image} | head -1`.strip
         end
       end
 

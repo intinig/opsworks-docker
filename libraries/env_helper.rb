@@ -16,11 +16,13 @@ class EnvHelper
         "DB_PASSWORD" => deploy[:database][:password],
         "DB_PORT" => deploy[:database][:port],
         "DB_RECONNECT" => deploy[:database][:reconnect],
-        "DB_USERNAME" =>  deploy[:database][:username]
+        "DB_USERNAME" =>  deploy[:database][:username],
       }.each do |k,v|
         environment[k] = v
       end
     end
+
+    environment["RELEASE_TAG"] = node[app_config["image"]]
 
     Chef::Log.info "[DEBUG] our pre-string env is #{environment.inspect}"
 

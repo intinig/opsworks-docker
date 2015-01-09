@@ -56,7 +56,7 @@ node[:deploy].each do |application, deploy|
 
           Chef::Log.info("Launching #{image}...")
           Chef::Log.info("[DEBUG] Environment #{environment.inspect}")
-          Chef::Log.info("[DEBUG] Env String #{e.env_string(environment, deploy}")
+          Chef::Log.info("[DEBUG] Env String #{e.env_string(environment, deploy)}")
 
           command "docker run -d -h #{hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
         end

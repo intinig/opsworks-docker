@@ -34,7 +34,7 @@ node[:deploy].each do |application, deploy|
         end
       end
 
-      e = EnvHelper.new app_config
+      e = EnvHelper.new app_config, node
 
       containers.times do |i|
         execute "kill running #{app_name}#{i} container" do

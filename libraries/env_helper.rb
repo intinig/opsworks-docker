@@ -1,10 +1,15 @@
 class EnvHelper
-  def initialize app_config
+  def initialize app_config, node
     @app_config = app_config
+    @node = node
   end
 
   def app_config
     @app_config
+  end
+
+  def node
+    @node
   end
 
   def env_string(environment, deploy)

@@ -50,7 +50,7 @@ class EnvHelper
   def stringify_hash(vals, parameter)
     memo = ""
     (vals || {}).each do |key, val|
-      memo + "#{parameter} '#{key}=#{val}' "
+      memo += "#{parameter} '#{key}=#{val}' "
     end
 
     memo

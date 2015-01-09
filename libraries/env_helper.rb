@@ -30,7 +30,7 @@ class EnvHelper
   end
 
   def volumes_from
-    stringify app_config["volumes"], "--volumes-from"
+    stringify app_config["volumes_from"], "--volumes-from"
   end
 
   def ports

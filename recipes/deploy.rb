@@ -30,7 +30,7 @@ node[:deploy].each do |application, deploy|
 
       ruby_block "adding #{image} id to environment" do
         block do
-          node[image] = `docker history -q #{image} | head -1`.strip
+          node.override[image] = `docker history -q #{image} | head -1`.strip
         end
       end
 

@@ -98,15 +98,15 @@ class EnvHelper
   end
 
   def manual?
-    check_deploy_level "manual", node
+    check_deploy_level "manual"
   end
 
   def auto?
-    check_deploy_level "auto", node
+    check_deploy_level "auto"
   end
 
   def cron?
-    check_deploy_level "cron", node
+    check_deploy_level "cron"
   end
 
   def check_deploy_level lvl

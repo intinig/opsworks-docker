@@ -14,7 +14,8 @@ node[:deploy].each do |application, deploy|
 
       image = app_config["image"]
       containers = app_config["containers"] || 1
-      environment = (app_config["env"] || {}).dup
+      environment = app_config["env_from"] ? node["deploy"][application]["containers"][app_config["env_from"]]["env"] : {}
+      environment = environment.merge(app_config["env"] || {})
 
       if app_config["hostname"] == "opsworks"
         hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]

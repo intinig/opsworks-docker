@@ -7,14 +7,11 @@ node[:deploy].each do |application, deploy|
   deploy["containers"].each do |c|
     c.each do |app_name, app_config|
       Chef::Log.debug("Evaluating #{app_name}...")
-
-      app_config.default["deploy"] = "auto" if node["manual"] && node["manual"].include?(app_name)
-      next if app_config["deploy"] == "manual"
+      e = EnvHelper.new app_config, deploy
+      next if e.manual? node
 
       image = app_config["image"]
       containers = app_config["containers"] || 1
-
-      e = EnvHelper.new app_config, deploy
 
       environment = e.merged_environment
 
@@ -43,7 +40,7 @@ node[:deploy].each do |application, deploy|
           environment["RELEASE_TAG"] = `docker history -q #{image} | head -1`.strip
           Chef::Log.info("Launching #{image}...")
           command "docker run -d -h #{e.hostname node} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
-          only_if { app_config["deploy"] == "auto"}
+          only_if { e.auto? node}
         end
 
         cron "#{app_name}#{i} cron" do
@@ -53,7 +50,7 @@ node[:deploy].each do |application, deploy|
           weekday e.cron["weekday"]
 
           command "docker run --rm --name #{app_name}#{i} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
-          only_if { app_config["deploy"] == "cron"}
+          only_if { e.cron? node }
         end
 
       end

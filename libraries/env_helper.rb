@@ -95,4 +95,25 @@ class EnvHelper
       "weekday" => cron_data["weekday"] || "*"
     }
   end
+
+  def deploy_level node
+    return "auto" if node["manual"] && node["manual"].include?(app_name)
+    app_config["deploy"]
+  end
+
+  def manual? node
+    check_deploy_level "manual", node
+  end
+
+  def auto? node
+    check_deploy_level "auto", node
+  end
+
+  def cron? node
+    check_deploy_level "cron", node
+  end
+
+  def check_deploy_level lvl, node
+    deploy_leve(node) == lvl
+  end
 end

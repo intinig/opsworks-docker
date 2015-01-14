@@ -10,17 +10,15 @@ node[:deploy].each do |application, deploy|
   deploy["containers"].each do |c|
     c.each do |app_name, app_config|
       Chef::Log.info("Evaluating #{app_name}...")
-      next unless app_config["deploy"] == "auto" || (node["manual"] && node["manual"].include?(app_name))
+      app_config["deploy"] = "auto" if node["manual"] && node["manual"].include?(app_name)
+      next if app_config["deploy"] == "manual"
 
       image = app_config["image"]
       containers = app_config["containers"] || 1
 
-      environment = EnvFetcher.merged_environment app_config, deploy
+      e = EnvHelper.new app_config, deploy
 
-      if app_config["hostname"] == "opsworks"
-        hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]
-        hostname = hostname.downcase.gsub(" ", "-")
-      end
+      environment = e.merged_environment
 
       Chef::Log.debug("Deploying '#{application}/#{app_name}', from '#{image}'")
 
@@ -28,8 +26,6 @@ node[:deploy].each do |application, deploy|
         Chef::Log.info("Pulling '#{image}'...")
         command "docker pull #{image}:latest"
       end
-
-      e = EnvHelper.new app_config
 
       containers.times do |i|
         execute "kill running #{app_name}#{i} container" do
@@ -50,7 +46,7 @@ node[:deploy].each do |application, deploy|
 
           Chef::Log.info("Launching #{image}...")
 
-          command "docker run -d -h #{hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
+          command "docker run -d -h #{e.hostname node} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
         end
       end
     end

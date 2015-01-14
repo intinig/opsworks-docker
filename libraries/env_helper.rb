@@ -1,10 +1,27 @@
 class EnvHelper
-  def initialize app_config
+  def initialize app_config, deploy
     @app_config = app_config
+    @deploy = deploy
   end
 
   def app_config
     @app_config
+  end
+
+  def deploy
+    @deploy
+  end
+
+  def retrieve container
+    if container
+      deploy["containers"].find {|cnt| cnt.keys.first == container}[container]["env"]
+    else
+      {}
+    end
+  end
+
+  def merged_environment
+    retrieve(app_config["env_from"], deploy).merge(app_config["env"] || {})
   end
 
   def env_string(environment, deploy)
@@ -56,5 +73,16 @@ class EnvHelper
     end
 
     memo
+  end
+
+  def hostname node
+    if app_config["hostname"] == "opsworks"
+      hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]
+      hostname = hostname.downcase.gsub(" ", "-")
+    else
+      hostname = ""
+    end
+
+    hostname
   end
 end

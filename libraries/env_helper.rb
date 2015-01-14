@@ -114,6 +114,6 @@ class EnvHelper
   end
 
   def check_deploy_level lvl, node
-    deploy_leve(node) == lvl
+    deploy_level(node) == lvl
   end
 end

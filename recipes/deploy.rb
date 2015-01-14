@@ -8,7 +8,7 @@ node[:deploy].each do |application, deploy|
     c.each do |app_name, app_config|
       Chef::Log.debug("Evaluating #{app_name}...")
 
-      app_config["deploy"] = "auto" if node["manual"] && node["manual"].include?(app_name)
+      app_config.default["deploy"] = "auto" if node["manual"] && node["manual"].include?(app_name)
       next if app_config["deploy"] == "manual"
 
       image = app_config["image"]

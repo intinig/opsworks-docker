@@ -21,7 +21,7 @@ class EnvHelper
   end
 
   def merged_environment
-    retrieve(app_config["env_from"], deploy).merge(app_config["env"] || {})
+    retrieve(app_config["env_from"]).merge(app_config["env"] || {})
   end
 
   def env_string(environment, deploy)
@@ -84,5 +84,15 @@ class EnvHelper
     end
 
     hostname
+  end
+
+  def cron
+    cron_data = app_config["cron"] || {}
+
+    {
+      "minute"  => cron_data["minute"]  || "*",
+      "hour"    => cron_data["hour"]    || "*",
+      "weekday" => cron_data["weekday"] || "*"
+    }
   end
 end

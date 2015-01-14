@@ -45,6 +45,17 @@ node[:deploy].each do |application, deploy|
           command "docker run -d -h #{e.hostname node} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
           only_if { app_config["deploy"] == "auto"}
         end
+
+        cron "#{app_name}#{i} cron" do
+          action :create
+          minute e.cron["minute"]
+          hour e.cron["hour"]
+          weekday e.cron["weekday"]
+
+          command "docker run --rm --name #{app_name}#{i} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
+          only_if { app_config["deploy"] == "cron"}
+        end
+
       end
     end
   end

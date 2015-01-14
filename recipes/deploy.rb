@@ -35,6 +35,12 @@ node[:deploy].each do |application, deploy|
           only_if "docker ps -a | grep ' #{app_name}#{i} '"
         end
 
+        execute "migrate #{app_name}#{i} container" do
+          Chef::Log.info("Migrating #{app_name}#{i}...")
+          command "docker run --rm  --name #{app_name}#{i}_migration #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["migration"]}"
+          only_if { e.migrate? && i == 0}
+        end
+
         execute "launch #{app_name}#{i} container" do
           hostname ||= "#{app_name}#{i}"
           environment["RELEASE_TAG"] = `docker history -q #{image} | head -1`.strip
@@ -43,11 +49,6 @@ node[:deploy].each do |application, deploy|
           only_if { e.auto? }
         end
 
-        execute "migrate #{app_name}#{i} container" do
-          Chef::Log.info("Migrating #{app_name}#{i}...")
-          command "docker run --rm  --name #{app_name}#{i}_migration #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["migration"]}"
-          only_if { e.migrate? }
-        end
 
         cron "#{app_name}#{i} cron" do
           action :create

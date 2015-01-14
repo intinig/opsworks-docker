@@ -49,7 +49,6 @@ node[:deploy].each do |application, deploy|
           only_if { e.auto? }
         end
 
-
         cron "#{app_name}#{i} cron" do
           action :create
           minute e.cron["minute"]

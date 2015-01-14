@@ -41,10 +41,9 @@ node[:deploy].each do |application, deploy|
         execute "launch #{app_name}#{i} container" do
           hostname ||= "#{app_name}#{i}"
           environment["RELEASE_TAG"] = `docker history -q #{image} | head -1`.strip
-
           Chef::Log.info("Launching #{image}...")
-
           command "docker run -d -h #{e.hostname node} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
+          only_if { app_config["deploy"] == "auto"}
         end
       end
     end

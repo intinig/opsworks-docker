@@ -1,15 +1,13 @@
 node[:deploy].each do |application, deploy|
-  if deploy[:application_type] != 'other'
+  if deploy[:application_type] != 'other' || deploy["environment_variables"]["APP_TYPE"] != 'docker'
     Chef::Log.debug("Skipping deploy::docker application #{application} as it is not deployed to this layer")
-    next
-  elsif deploy["environment_variables"]["APP_TYPE"] != 'docker'
-    Chef::Log.debug("Skipping deploy::docker application #{application} as it is not of type 'docker'")
     next
   end
 
   deploy["containers"].each do |c|
     c.each do |app_name, app_config|
-      Chef::Log.info("Evaluating #{app_name}...")
+      Chef::Log.debug("Evaluating #{app_name}...")
+
       app_config["deploy"] = "auto" if node["manual"] && node["manual"].include?(app_name)
       next if app_config["deploy"] == "manual"
 

@@ -20,7 +20,7 @@ class EnvHelper
     retrieve(app_config["env_from"]).merge(app_config["env"] || {})
   end
 
-  def env_string(environment, deploy)
+  def env_string environment
     if app_config["database"]
       {
         "DB_ADAPTER" => deploy[:database][:adapter],
@@ -112,4 +112,9 @@ class EnvHelper
   def check_deploy_level lvl
     deploy_level == lvl
   end
+
+  def migrate?
+    auto? && app_config["migration"]
+  end
+
 end

@@ -39,8 +39,14 @@ node[:deploy].each do |application, deploy|
           hostname ||= "#{app_name}#{i}"
           environment["RELEASE_TAG"] = `docker history -q #{image} | head -1`.strip
           Chef::Log.info("Launching #{image}...")
-          command "docker run -d -h #{e.hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
+          command "docker run -d -h #{e.hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
           only_if { e.auto? }
+        end
+
+        execute "migrate #{app_name}#{i} container" do
+          Chef::Log.info("Migrating #{app_name}#{i}...")
+          command "docker run --rm  --name #{app_name}#{i}_migration #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["migration"]}"
+          only_if { e.migrate? }
         end
 
         cron "#{app_name}#{i} cron" do
@@ -49,7 +55,7 @@ node[:deploy].each do |application, deploy|
           hour e.cron["hour"]
           weekday e.cron["weekday"]
 
-          command "docker run --rm --name #{app_name}#{i} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
+          command "docker run --rm --name #{app_name}#{i} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
           only_if { e.cron? }
         end
 

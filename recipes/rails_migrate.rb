@@ -1,14 +1,10 @@
 include_recipe 'deploy'
 
 node[:deploy].each do |application, deploy|
-
-  if deploy[:application_type] != 'other'
-    Chef::Log.debug("Skipping application #{application} as it is not deployed to this layer")
+  if deploy[:application_type] != 'other' || deploy["environment_variables"]["APP_TYPE"] != 'docker'
+    Chef::Log.debug("Skipping deploy::docker application #{application} as it is not deployed to this layer")
     next
-  elsif deploy[:environment_variables][:APP_TYPE] != 'docker'
-    Chef::Log.debug("Skipping application #{application} as it is not of type 'docker'")
-    next
-  elsif node[:migrate] != true
+  elsif !node[:migrate]
     next
   end
 

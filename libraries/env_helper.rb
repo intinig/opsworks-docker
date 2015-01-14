@@ -1,15 +1,11 @@
 class EnvHelper
-  def initialize app_config, deploy
+  attr_reader :app_config, :deploy, :app_name, :node
+
+  def initialize app_name, app_config, deploy, node
+    @node = node
+    @app_name = app_name
     @app_config = app_config
     @deploy = deploy
-  end
-
-  def app_config
-    @app_config
-  end
-
-  def deploy
-    @deploy
   end
 
   def retrieve container
@@ -75,7 +71,7 @@ class EnvHelper
     memo
   end
 
-  def hostname node
+  def hostname
     if app_config["hostname"] == "opsworks"
       hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]
       hostname = hostname.downcase.gsub(" ", "-")
@@ -96,24 +92,24 @@ class EnvHelper
     }
   end
 
-  def deploy_level node
+  def deploy_level
     return "auto" if node["manual"] && node["manual"].include?(app_name)
     app_config["deploy"]
   end
 
-  def manual? node
+  def manual?
     check_deploy_level "manual", node
   end
 
-  def auto? node
+  def auto?
     check_deploy_level "auto", node
   end
 
-  def cron? node
+  def cron?
     check_deploy_level "cron", node
   end
 
-  def check_deploy_level lvl, node
+  def check_deploy_level lvl
     deploy_level(node) == lvl
   end
 end

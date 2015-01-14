@@ -7,8 +7,8 @@ node[:deploy].each do |application, deploy|
   deploy["containers"].each do |c|
     c.each do |app_name, app_config|
       Chef::Log.debug("Evaluating #{app_name}...")
-      e = EnvHelper.new app_config, deploy
-      next if e.manual? node
+      e = EnvHelper.new app_name, app_config, deploy, node
+      next if e.manual?
 
       image = app_config["image"]
       containers = app_config["containers"] || 1
@@ -39,8 +39,8 @@ node[:deploy].each do |application, deploy|
           hostname ||= "#{app_name}#{i}"
           environment["RELEASE_TAG"] = `docker history -q #{image} | head -1`.strip
           Chef::Log.info("Launching #{image}...")
-          command "docker run -d -h #{e.hostname node} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
-          only_if { e.auto? node}
+          command "docker run -d -h #{e.hostname} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
+          only_if { e.auto? }
         end
 
         cron "#{app_name}#{i} cron" do
@@ -50,7 +50,7 @@ node[:deploy].each do |application, deploy|
           weekday e.cron["weekday"]
 
           command "docker run --rm --name #{app_name}#{i} #{e.env_string(environment, deploy)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
-          only_if { e.cron? node }
+          only_if { e.cron? }
         end
 
       end

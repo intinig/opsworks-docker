@@ -118,10 +118,6 @@ class EnvHelper
   end
 
   def cmd container_id
-    if app_config["command"] == "generate_socket_file"
-      "/var/run/#{app_name}#{container_id}"
-    else
-      app_config["command"]
-    end
+    app_config["command"].to_s.gsub("${app_name}", "#{app_name}#{i}")
   end
 end

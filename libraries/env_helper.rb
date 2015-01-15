@@ -10,7 +10,7 @@ class EnvHelper
 
   def retrieve container
     if container
-      deploy["containers"].find {|cnt| cnt.keys  == container}[container]["env"]
+      deploy["containers"].find {|cnt| cnt.keys.first  == container}[container]["env"]
     else
       {}
     end

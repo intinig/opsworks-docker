@@ -24,6 +24,7 @@ node[:deploy].each do |application, deploy|
 
       containers.times do |i|
         execute "kill running #{app_name}#{i} container" do
+          sleep(30) if i > 0
           Chef::Log.info("Killing running #{application}/#{app_name}#{i} container...")
           command "docker kill #{app_name}#{i}"
           only_if "docker ps -f status=running | grep ' #{app_name}#{i} '"

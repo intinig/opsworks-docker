@@ -71,12 +71,12 @@ class EnvHelper
     memo
   end
 
-  def hostname
+  def hostname container_id
     if app_config["hostname"] == "opsworks"
       hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]
       hostname = hostname.downcase.gsub(" ", "-")
     else
-      hostname = app_name
+      hostname = "#{app_name}#{container_id}"
     end
 
     hostname
@@ -117,4 +117,11 @@ class EnvHelper
     auto? && app_config["migration"]
   end
 
+  def cmd container_id
+    if app_config["command"] == "generate_socket_file"
+      "/var/run/#{app_name}#{container_id}"
+    else
+      app_config["command"]
+    end
+  end
 end

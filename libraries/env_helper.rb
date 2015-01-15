@@ -118,6 +118,6 @@ class EnvHelper
   end
 
   def cmd container_id
-    app_config["command"].to_s.gsub("${app_name}", "#{app_name}#{i}")
+    app_config["command"].to_s.gsub("${app_name}", "#{app_name}#{container_id}")
   end
 end

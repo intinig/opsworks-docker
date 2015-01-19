@@ -22,6 +22,7 @@ node[:deploy].each do |application, deploy|
       execute "launch #{app_name} container" do
         Chef::Log.info("Launching #{image}...")
         command "docker run -h #{app_name} --name #{app_name} #{e.volumes} #{image}"
+        not_if "docker ps -a | grep #{app_name}"
       end
     end
   end

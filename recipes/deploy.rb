@@ -53,7 +53,6 @@ node[:deploy].each do |application, deploy|
           command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{e.cmd i}"
           only_if { e.auto? }
         end
-        # ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'
 
         cron "#{app_name}#{i} cron" do
           action :create

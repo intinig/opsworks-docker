@@ -25,7 +25,7 @@ node[:deploy].each do |application, deploy|
       containers.times do |i|
         ruby_block "waiting" do
           block do
-            sleep(app_config["startup_time"]) if app_config["startup_time"] && i > 0
+            sleep(app_config["startup_time"].to_i) if app_config["startup_time"] && i > 0
           end
         end
 

@@ -50,7 +50,7 @@ node[:deploy].each do |application, deploy|
         execute "launch #{app_name}#{i} container" do
           environment["RELEASE_TAG"] = `docker history -q #{image} | head -1`.strip
           Chef::Log.info("Launching #{image}...")
-          command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{e.cmd i}"
+          command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{e.entrypoint} #{e.cmd i}"
           only_if { e.auto? }
         end
 
@@ -59,7 +59,7 @@ node[:deploy].each do |application, deploy|
           minute e.cron["minute"]
           hour e.cron["hour"]
           weekday e.cron["weekday"]
-          command "docker run --rm --name #{app_name}#{i} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["command"]}"
+          command "docker run --rm --name #{app_name}#{i} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{e.entrypoint} #{app_config["command"]}"
           only_if { e.cron? }
         end
 

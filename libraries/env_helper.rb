@@ -120,4 +120,12 @@ class EnvHelper
   def cmd container_id
     app_config["command"].to_s.gsub("${app_name}", "#{app_name}#{container_id}")
   end
+
+  def entrypoint
+    if app_config["entrypoint"]
+      "--entrypoint #{app_config['entrypoint']"
+    else
+      ""
+    end
+  end
 end

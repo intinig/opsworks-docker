@@ -123,7 +123,7 @@ class EnvHelper
 
   def entrypoint
     if app_config["entrypoint"]
-      "--entrypoint #{app_config['entrypoint']}"
+      "--entrypoint=\"#{app_config['entrypoint']}\""
     else
       ""
     end

@@ -76,7 +76,7 @@ class EnvHelper
       hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]
       hostname = hostname.downcase.gsub(" ", "-")
     else
-      hostname = "#{app_name}#{container_id}"
+      hostname = "#{app_name}#{container_id}." + node[:opsworks][:instance][:hostname]
     end
 
     hostname

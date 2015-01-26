@@ -57,7 +57,7 @@ node[:deploy].each do |application, deploy|
 
         ruby_block "get deployments info #{app_name}#{i} container" do
           Chef::Log.info("Get deployments info #{app_name}#{i} container...")
-          block docker
+          block do
             default[:deploy][application][:containers][app_name][:deployments] = {
               :release_tag  => environment["RELEASE_TAG"],
               :git_revision => `docker run #{image} -c 'echo $GIT_REVISION'`

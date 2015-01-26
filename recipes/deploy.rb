@@ -57,7 +57,7 @@ node[:deploy].each do |application, deploy|
 
         ruby_block "get deployments info #{app_name}#{i} container" do
           only_if {
-            Chef::Log.info("Launching #{image}...")
+            Chef::Log.info("Get deployments info #{app_name}#{i} container...")
           }
           block do
             c[:deployments][:release_tag] = environment["RELEASE_TAG"]

@@ -11,7 +11,7 @@ node["deploy"].each do |application, deploy|
           access_token = app_config["notifications"]["rollbar"]["access_token"]
           env_var = app_config["notifications"]["rollbar"]["env_var"]
           rev_var = app_config["notifications"]["rollbar"]["rev_var"]
-          cmd = "docker exec #{app_name}0 -c 'curl https://api.rollbar.com/api/1/deploy/ -F access_token=#{access_token} -F environment=$#{env_var} -F revision=#{rev_var} -F local_username=#{deploy["user"]}'"
+          cmd = "docker exec #{app_name}0 -c 'curl https://api.rollbar.com/api/1/deploy/ -F access_token=#{access_token} -F environment=$#{env_var} -F revision=$#{rev_var} -F local_username=#{deploy["user"]}'"
 
           Chef::Log.info("Notifying rollbar with command `#{cmd}`")
           command cmd

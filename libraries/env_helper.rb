@@ -73,10 +73,13 @@ class EnvHelper
 
   def hostname container_id
     if app_config["hostname"] == "opsworks"
-      hostname = node[:opsworks][:stack][:name] + " " + node[:opsworks][:instance][:hostname]
+      hostname = node["opsworks"]["stack"]["name"] +
+                 " " +
+                 node["opsworks"]["instance"]["hostname"]
+
       hostname = hostname.downcase.gsub(" ", "-")
     else
-      hostname = "#{app_name}#{container_id}." + node[:opsworks][:instance][:hostname]
+      hostname = "#{app_name}#{container_id}." + node["opsworks"]["instance"]["hostname"]
     end
 
     hostname

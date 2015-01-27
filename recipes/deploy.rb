@@ -1,4 +1,4 @@
-node[:deploy].each do |application, deploy|
+node["deploy"].each do |application, deploy|
   if deploy[:application_type] != 'other' || deploy["environment_variables"]["APP_TYPE"] != 'docker'
     Chef::Log.debug("Skipping deploy::docker application #{application} as it is not deployed to this layer")
     next
@@ -48,7 +48,8 @@ node[:deploy].each do |application, deploy|
         end
 
         execute "launch #{app_name}#{i} container" do
-          environment["RELEASE_TAG"] = `docker history -q #{image} | head -1`.strip
+          (history = Mixlib::ShellOut.new "docker history -q #{image} | head -1").run_command
+          environment["RELEASE_TAG"] = history.stdout.strip
           Chef::Log.info("Launching #{image}...")
           command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image} #{e.cmd i}"
           only_if { e.auto? }

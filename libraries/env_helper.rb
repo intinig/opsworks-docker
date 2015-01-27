@@ -35,8 +35,6 @@ class EnvHelper
       end
     end
 
-    Chef::Log.info "[DEBUG] our pre-string env is #{environment.inspect}"
-
     stringify_hash(environment, "--env")
   end
 

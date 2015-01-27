@@ -55,17 +55,6 @@ node["deploy"].each do |application, deploy|
           only_if { e.auto? }
         end
 
-        ruby_block "get deployments info #{app_name} container" do
-          Chef::Log.info("Get deployments info #{app_name} container...")
-          block do
-            default["deploy"][application]["containers"][app_name]["deployments"] = {
-              :release_tag  => environment["RELEASE_TAG"],
-              :git_revision => `docker run #{image} -c 'echo $GIT_REVISION'`
-            }
-          end
-          only_if { i == 0 }
-        end
-
         cron "#{app_name}#{i} cron" do
           action :create
           minute e.cron["minute"]

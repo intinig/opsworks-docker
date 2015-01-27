@@ -52,6 +52,18 @@ node[:deploy].each do |application, deploy|
           Chef::Log.info("Launching #{image}...")
           command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image} #{e.cmd i}"
           only_if { e.auto? }
+          notifies :run, "execute[get deployments info #{app_name}#{i} container]", :immediately
+        end
+
+        ruby_block "get deployments info #{app_name}#{i} container" do
+          Chef::Log.info("Get deployments info #{app_name}#{i} container...")
+          block do
+            default[:deploy][application][:containers][app_name][:deployments] = {
+              :release_tag  => environment["RELEASE_TAG"],
+              :git_revision => `docker run #{image} -c 'echo $GIT_REVISION'`
+            }
+          end
+          action :nothing
         end
 
         cron "#{app_name}#{i} cron" do

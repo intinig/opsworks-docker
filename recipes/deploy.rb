@@ -17,7 +17,7 @@ node["deploy"].each do |application, deploy|
       Chef::Log.debug("Deploying '#{application}/#{app_name}', from '#{image}'")
 
       execute "pulling #{image}" do
-        Chef::Log.info("Pulling '#{image}'...")
+        Chef::Log.debug("Pulling '#{image}'...")
         command "docker pull #{image}:latest"
         not_if { e.manual? }
       end
@@ -54,7 +54,7 @@ node["deploy"].each do |application, deploy|
 
           Chef::Log.info("Launching #{image}...")
           command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image} #{e.cmd i}"
-          not_if {"docker ps -f status=running | grep ' #{app_name}#{i} '"}
+          not_if "docker ps -f status=running | grep ' #{app_name}#{i} '"
         end
 
         cron "#{app_name}#{i} cron" do

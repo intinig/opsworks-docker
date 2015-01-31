@@ -9,7 +9,7 @@ node["deploy"].each do |application, deploy|
       e = EnvHelper.new app_name, app_config, deploy, node
 
       execute "launch #{app_name} data only container" do
-        Chef::Log.info("Launching #{busybox} for #{app_name}...")
+        Chef::Log.info("Launching busybox for #{app_name}...")
         command "docker run --name #{app_name} #{e.volumes} busybox"
         not_if "docker ps -a | grep #{app_name}"
       end

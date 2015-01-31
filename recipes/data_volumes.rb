@@ -6,22 +6,11 @@ node["deploy"].each do |application, deploy|
 
   deploy["data_volumes"].each do |c|
     c.each do |app_name, app_config|
-      Chef::Log.debug("Evaluating #{app_name}...")
       e = EnvHelper.new app_name, app_config, deploy, node
 
-      image = "busybox"
-
-      Chef::Log.debug("Deploying '#{application}/#{app_name}', from '#{image}'")
-
-      ruby_block "waiting" do
-        block do
-          sleep(app_config["startup_time"].to_i) if app_config["startup_time"] && i > 0
-        end
-      end
-
-      execute "launch #{app_name} container" do
-        Chef::Log.info("Launching #{image}...")
-        command "docker run -h #{app_name} --name #{app_name} #{e.volumes} #{image}"
+      execute "launch #{app_name} data only container" do
+        Chef::Log.info("Launching #{busybox} for #{app_name}...")
+        command "docker run --name #{app_name} #{e.volumes} busybox"
         not_if "docker ps -a | grep #{app_name}"
       end
     end

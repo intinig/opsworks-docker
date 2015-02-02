@@ -2,7 +2,7 @@
 # Does not support any other platform but extending it
 # is trivial.
 
-package "docker" do
+package "docker-io" do
   action :install
 end
 

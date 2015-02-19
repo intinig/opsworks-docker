@@ -125,7 +125,7 @@ class EnvHelper
   end
 
   def cmd container_id
-    app_config["command"].to_s % interpolations
+    app_config["command"].to_s % interpolations(container_id: container_id)
   end
 
   def entrypoint

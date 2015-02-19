@@ -8,10 +8,10 @@ class EnvHelper
     @deploy = deploy
   end
 
-  def interpolations
+  def interpolations options = {}
     {
       public_ip: node[:opsworks][:instance][:ip],
-      app_name: "#{app_name}#{container_id}",
+      app_name: "#{app_name}#{options[:container_id]}",
       opsworks: readable_hostname
     }
   end
@@ -83,7 +83,7 @@ class EnvHelper
 
   def hostname container_id
     if app_config["hostname"]
-      app_config["hostname"] % interpolations
+      app_config["hostname"] % interpolations(container_id: container_id)
     else
       "#{app_name}#{container_id}." + node["opsworks"]["instance"]["hostname"]
     end

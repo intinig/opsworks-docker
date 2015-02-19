@@ -8,6 +8,14 @@ class EnvHelper
     @deploy = deploy
   end
 
+  def interpolations
+    {
+      public_ip: node[:opsworks][:instance][:ip],
+      app_name: "#{app_name}#{container_id}",
+      opsworks: readable_hostname
+    }
+  end
+
   def retrieve container
     if container
       deploy["containers"].find {|cnt| cnt.keys.first  == container}[container]["env"]
@@ -56,31 +64,29 @@ class EnvHelper
 
   def stringify(vals, parameter)
     (vals || []).inject("") do |memo, value|
-      memo + "#{parameter} #{value} "
+      memo + "#{parameter} #{value % interpolations} "
     end
   end
 
   def stringify_hash(vals, parameter)
     memo = ""
     (vals || {}).each do |key, val|
-      memo += "#{parameter} '#{key}=#{val}' "
+      memo += "#{parameter} '#{key}=#{val % interpolations}' "
     end
 
     memo
   end
 
+  def readable_hostname
+    (node["opsworks"]["stack"]["name"] + " " + node["opsworks"]["instance"]["hostname"]).downcase.gsub(" ", "-")
+  end
+
   def hostname container_id
-    if app_config["hostname"] == "opsworks"
-      hostname = node["opsworks"]["stack"]["name"] +
-                 " " +
-                 node["opsworks"]["instance"]["hostname"]
-
-      hostname = hostname.downcase.gsub(" ", "-")
+    if app_config["hostname"]
+      app_config["hostname"] % interpolations
     else
-      hostname = "#{app_name}#{container_id}." + node["opsworks"]["instance"]["hostname"]
+      "#{app_name}#{container_id}." + node["opsworks"]["instance"]["hostname"]
     end
-
-    hostname
   end
 
   def cron
@@ -119,7 +125,7 @@ class EnvHelper
   end
 
   def cmd container_id
-    app_config["command"].to_s.gsub("${app_name}", "#{app_name}#{container_id}")
+    app_config["command"].to_s % interpolations
   end
 
   def entrypoint

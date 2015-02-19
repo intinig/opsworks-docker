@@ -64,14 +64,14 @@ class EnvHelper
 
   def stringify(vals, parameter)
     (vals || []).inject("") do |memo, value|
-      memo + "#{parameter} #{value % interpolations} "
+      memo + "#{parameter} #{value.to_s % interpolations} "
     end
   end
 
   def stringify_hash(vals, parameter)
     memo = ""
     (vals || {}).each do |key, val|
-      memo += "#{parameter} '#{key}=#{val % interpolations}' "
+      memo += "#{parameter} '#{key}=#{val.to_s % interpolations}' "
     end
 
     memo

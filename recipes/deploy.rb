@@ -22,7 +22,7 @@ node["deploy"].each do |application, deploy|
         not_if { e.manual? }
       end
 
-      containers.times do |i|
+      containers.to_i.times do |i|
         ruby_block "waiting" do
           block do
             sleep(app_config["startup_time"].to_i) if app_config["startup_time"] && i > 0

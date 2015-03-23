@@ -1,7 +1,7 @@
 name        "docker"
 description "Manage Docker images"
 maintainer  "Giovanni Intini"
-license     "Apache 2.0"
+license     "MIT"
 version     "0.0.1"
 depends     "logrotate", "~> 1.8.0"
 

@@ -62,7 +62,7 @@ node["deploy"].each do |application, deploy|
           minute e.cron["minute"]
           hour e.cron["hour"]
           weekday e.cron["weekday"]
-          command "docker run --rm --name #{app_name}#{i} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image} #{app_config["command"]}"
+          command "docker run --rm #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image} #{app_config["command"]}"
           only_if { e.cron? && i==0 }
         end
 

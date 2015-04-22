@@ -1,6 +1,6 @@
 node["deploy"].each do |application, deploy|
   if deploy[:application_type] != 'other' || deploy["environment_variables"]["APP_TYPE"] != 'docker'
-    Chef::Log.debug("Skipping deploy::docker application #{application} as it is not deployed to this layer")
+    Chef::Log.debug("Skipping docker::deploy application #{application} as it is not deployed to this layer")
     next
   end
 

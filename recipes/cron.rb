@@ -15,7 +15,7 @@ node["deploy"].each do |application, deploy|
 
       Chef::Log.debug("Cron '#{application}/#{app_name}', from '#{image}'")
 
-      cron "#{app_name}#{i} cron" do
+      cron "#{app_name} cron" do
         action :create
         minute e.cron["minute"]
         hour e.cron["hour"]

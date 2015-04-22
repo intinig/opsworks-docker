@@ -56,16 +56,6 @@ node["deploy"].each do |application, deploy|
           command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image} #{e.cmd i}"
           not_if "docker ps -f status=running | grep ' #{app_name}#{i} '"
         end
-
-        cron "#{app_name}#{i} cron" do
-          action :create
-          minute e.cron["minute"]
-          hour e.cron["hour"]
-          weekday e.cron["weekday"]
-          command "docker run --rm #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image} #{app_config["command"]}"
-          only_if { e.cron? && i==0 }
-        end
-
       end
     end
   end

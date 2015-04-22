@@ -13,7 +13,15 @@ node["deploy"].each do |application, deploy|
 
       environment = e.merged_environment
 
+      next unless e.cron?
+
       Chef::Log.debug("Cron '#{application}/#{app_name}', from '#{image}'")
+
+      execute "pulling #{image}" do
+        Chef::Log.debug("Pulling '#{image}'...")
+        command "docker pull #{image}:latest"
+        only_if { e.cron? }
+      end
 
       cron "#{app_name} cron" do
         action :create

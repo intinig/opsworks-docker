@@ -16,6 +16,8 @@ node["deploy"].each do |application, deploy|
 
       Chef::Log.debug("Deploying '#{application}/#{app_name}', from '#{image}'")
 
+      next if e.cron?
+
       execute "pulling #{image}" do
         Chef::Log.debug("Pulling '#{image}'...")
         command "docker pull #{image}:latest"

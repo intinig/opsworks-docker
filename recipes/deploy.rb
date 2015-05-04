@@ -10,6 +10,8 @@ node["deploy"].each do |application, deploy|
       e = EnvHelper.new app_name, app_config, deploy, node
 
       image = app_config["image"]
+      tag = app_config["tag"] ? app_config["tag"] : "latest"
+
       containers = app_config["containers"] || 1
 
       environment = e.merged_environment
@@ -20,7 +22,7 @@ node["deploy"].each do |application, deploy|
 
       execute "pulling #{image}" do
         Chef::Log.debug("Pulling '#{image}'...")
-        command "docker pull #{image}:latest"
+        command "docker pull #{image}:#{tag}"
         not_if { e.manual? }
       end
 
@@ -46,7 +48,7 @@ node["deploy"].each do |application, deploy|
 
         execute "migrate #{app_name}#{i} container" do
           Chef::Log.info("Migrating #{app_name}#{i}...")
-          command "docker run --rm #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image} #{app_config["migration"]}"
+          command "docker run --rm #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image}:#{tag} #{app_config["migration"]}"
           only_if { e.migrate? && i == 0 && e.auto? }
         end
 
@@ -55,7 +57,7 @@ node["deploy"].each do |application, deploy|
           environment["RELEASE_TAG"] = history.stdout.strip
 
           Chef::Log.info("Launching #{image}...")
-          command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image} #{e.cmd i}"
+          command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image}:#{tag} #{e.cmd i}"
           not_if "docker ps -f status=running | grep ' #{app_name}#{i} '"
         end
       end

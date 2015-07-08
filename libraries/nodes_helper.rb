@@ -1,5 +1,5 @@
 module NodesHelper
-  def special_node
+  def self.special_node node
     instances = node[:opsworks][:layers]['docker'][:instances]
     selected_node = instances.keys.sort.first
     instances[selected_node]

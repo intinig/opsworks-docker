@@ -47,9 +47,14 @@ node["deploy"].each do |application, deploy|
         end
 
         execute "migrate #{app_name}#{i} container" do
-          Chef::Log.info("Migrating #{app_name}#{i}...")
+          if special_node = node[:opsworks][:layers]['docker'][:instances].keys.sort.first
+            Chef::Log.info("Migrating #{app_name}#{i}...")
+          else
+            Chef::Log.info("Skipping migrations for #{app_name}#{i} (node not selected)")
+          end
+
           command "docker run --rm #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image}:#{tag} #{app_config["migration"]}"
-          only_if { e.migrate? && i == 0 && e.auto? }
+          only_if { e.migrate? && i == 0 && e.auto? && special_node[:hostname] == node[:opsworks][:instance][:hostname]}
         end
 
         execute "launch #{app_name}#{i} container" do

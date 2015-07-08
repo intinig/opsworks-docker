@@ -47,7 +47,7 @@ node["deploy"].each do |application, deploy|
         end
 
         execute "migrate #{app_name}#{i} container" do
-          if special_node = node[:opsworks][:layers]['docker'][:instances].keys.sort.first
+          if special_node = node[:opsworks][:layers]['docker'][:instances] #.keys.sort.first
             Chef::Log.info(special_node.inspect)
             Chef::Log.info("Migrating #{app_name}#{i}...")
           else

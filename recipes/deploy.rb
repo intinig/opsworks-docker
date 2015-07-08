@@ -49,7 +49,7 @@ node["deploy"].each do |application, deploy|
         execute "migrate #{app_name}#{i} container" do
           special_node = NodesHelper.special_node node
           Chef::Log.info("Migrating #{app_name}#{i}... (only on #{special_node})")
-
+          Chef::Log.info("[RACCO] #{special_node[:hostname]} == #{node[:opsworks][:instance][:hostname]}")
           command "docker run --rm #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{image}:#{tag} #{app_config["migration"]}"
           only_if { e.migrate? && i == 0 && e.auto? && special_node[:hostname] == node[:opsworks][:instance][:hostname]}
         end

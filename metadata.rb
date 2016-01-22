@@ -4,7 +4,7 @@ maintainer  "Giovanni Intini"
 license     "MIT"
 version     "0.0.2"
 depends     "logrotate", "~> 1.8.0"
-depends     "aws", "~> 2.8.0"
+depends     "aws", "= 2.5.0"
 
 recipe "docker::install", "Install and setup docker"
 recipe "docker::cleanup", "Removes unused images"

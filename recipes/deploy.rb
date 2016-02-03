@@ -43,7 +43,7 @@ node["deploy"].each do |application, deploy|
         execute "remove stopped #{app_name}#{i} container" do
           Chef::Log.info("Removing the #{application}/#{app_name}#{i} container...")
           command "docker rm  #{app_name}#{i}"
-          only_if "docker ps -af status=exited | grep ' #{app_name}#{i} '"
+          only_if "docker ps -af status=exited | grep ' #{app_name}#{i}'"
         end
 
         execute "migrate #{app_name}#{i} container" do

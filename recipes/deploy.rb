@@ -37,7 +37,7 @@ node["deploy"].each do |application, deploy|
         execute "kill running #{app_name}#{i} container" do
           Chef::Log.info("Killing running #{application}/#{app_name}#{i} container...")
           command "docker kill #{app_name}#{i}"
-          only_if { system("docker ps -f status=running | grep ' #{app_name}#{i} '") && e.auto? }
+          only_if { system("docker ps -f status=running | grep ' #{app_name}#{i}'") && e.auto? }
         end
 
         execute "remove stopped #{app_name}#{i} container" do
@@ -59,7 +59,7 @@ node["deploy"].each do |application, deploy|
 
           Chef::Log.info("Launching #{image}...")
           command "docker run -d -h #{e.hostname i} --name #{app_name}#{i} #{e.ports} #{e.env_string(environment)} #{e.links} #{e.volumes} #{e.volumes_from} #{e.entrypoint} #{image}:#{tag} #{e.cmd i}"
-          not_if "docker ps -f status=running | grep ' #{app_name}#{i} '"
+          not_if "docker ps -f status=running | grep ' #{app_name}#{i}'"
         end
       end
     end

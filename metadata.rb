@@ -2,7 +2,7 @@ name        "docker"
 description "Manage Docker images"
 maintainer  "Giovanni Intini"
 license     "MIT"
-version     "0.0.2"
+version     "0.0.3"
 depends     "logrotate", "~> 1.8.0"
 depends     "aws", "= 2.5.0"
 
